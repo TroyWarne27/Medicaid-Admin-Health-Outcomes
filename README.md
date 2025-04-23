@@ -1,11 +1,21 @@
-# Summary
+# Estimating the impact of State Medicaid Expenditures on the Hospital Adminstrative Cost Burden and the Associated Impact on Hospital Quality of Care
+
+## Summary
 
 This repository is for work done in STATA over the course of a semester in my graduate coursework at University of Nevada Reno. This is a two part analysis investigating (1) the impact of adminstrative spending by state Medicaid programs on the adminstrative cost burden of hospitals for billing and insurance related activities and (2) the impact of the level of adminstrative cost burden for these activities on metrics for the quality of care received at the same hospitals. 
 
-# Final Papers
+## Final Papers
+
+Paper 1: The Effectiveness of Medicaid Administrative Spending on Reducing the Hospital Administrative Burden
+
+File: Medicaid Expenditure and Hospital Adminstrative Burden.pdf
+
+Paper 2: The Effect of Administrative Costs on Hospital Health Outcomes
+
+File: Adminstrative Burden and Hosptial Quality Measures.pdf
 
 
-# Data Sources
+## Data Sources
 
 1) Hospital Cost Reports submitted to CMS annually using the Form CMS-2552-10 for fiscal years 2015 through 2019
 2) State Medicaid Program Expenses submitted quarterly on CMS Form 64 for fiscal years 2015 through 2019
@@ -14,7 +24,7 @@ This repository is for work done in STATA over the course of a semester in my gr
    b) Percentage of patients who left the emergency department before being seen
    c) Median time a patient spent in the Emergency department before leaving from the visit
 
-# Outline of Methodology and Code
+## Outline of Methodology and Code
 
 1st Paper: The Effectiveness of Medicaid Administrative Spending on Reducing the Hospital Administrative Burden
 
