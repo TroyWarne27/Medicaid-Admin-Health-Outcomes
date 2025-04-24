@@ -15,11 +15,14 @@ drop if fiscalyear == 2020;
  
 gen  admintotal2 = admintotal;
 
+/* Some hospitals do not report adminstrative costs categorically, but all report adminstrative salaries */
 replace admintotal2 = abs(adminsalaries) if admintotal == 0;
 
 gen adminreplace = 0;
 
 replace adminreplace = 1 if admintotal == 0 & admintotal2 != 0;
+
+/* Test statistical significance of the data replacement */
 
 ttest admintotal2, by(adminreplace)
 
@@ -27,7 +30,11 @@ ttest admintotal == admintotal2
 
 stop 
 
+/* Drop massive outlier for one Arizona hospital in 2015 */
+
 drop if CCN_num == "030010" & fiscalyear == 2015;
+
+/* Drop if missing other key variables */
 
 drop if missing(urban);
 
@@ -35,6 +42,7 @@ drop if totalrev == 0;
 
 
 
+/* Some hospitals report costs as negative, make all values positive */
 
 gen medicaidcosts2 = abs(medicaidcosts);
 
@@ -42,11 +50,15 @@ drop medicaidcosts;
 
 rename medicaidcosts2 medicaidcosts;
 
+/* Some hospitals report revenues as negative, make all values positive */
+
 gen medicaidrev2 = abs(medicaidrev);
 
 drop medicaidrev;
 
 rename medicaidrev2 medicaidrev;
+
+/* Calculate profit/loss on Medicaid patients */
 
 gen medicaidnet = medicaidcosts - medicaidrev;
  
@@ -75,13 +87,14 @@ replace adminzero = 1 if admintotal == 0;
 
 preserve;
 
+/* Drop other outliers for Hospitals Reporting incomplete information */
 drop if medicaidcosts == 0 & medicaidrev != 0;
 
-drop if CCN_num == "030010" & fiscalyear == 2015;
 
 gen uncomp2 = CMSuncompensatedcare / 1000000;
 gen medicaidunpaid2 = medicaidnet/ 1000000;
 
+/* Figure 4 */
 graph bar (mean) medicaidunpaid2 uncomp2, over(fiscalyear)
  title(Average Hospital Unpaid Costs)
  ytitle(Costs in Millions of $)
@@ -98,7 +111,6 @@ restore;
 
 preserve;
 
-drop if CCN_num == "030010" & fiscalyear == 2015;
 
 collapse (sum)  CMSuncompensatedcare medicaidnet, by (fiscalyear);
 
@@ -109,7 +121,7 @@ gen uncomp2 =  CMSuncompensatedcare/1000000000;
 gen medicaidnet2 = medicaidnet/1000000000;
 
 
-
+/* Figure 3 */
 graph bar medicaidnet2 uncomp2, over(fiscalyear)
  title(Hospital Costs Unpaid by Medcaid)
  ytitle(Total Costs in Billions of $)
@@ -121,7 +133,7 @@ graph export "Total_Unpaid_Medicaid.eps", as(eps) replace;
 restore;
 
 
-
+/*Figure 1 */
 preserve;
 
 gen BIRest = .085 * totalrev;
@@ -465,6 +477,7 @@ gen medicaidadm = Totalmedicaidadmin/1000000000;
 
 gen techspend = MMISspend/1000000000;
 
+/* Figure 5 */
 
 graph bar (mean) medicaidadm techspend, over(fiscalyear)
  title(Average Medicaid Admin Spending)
