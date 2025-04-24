@@ -1,5 +1,6 @@
 clear 
 
+/* Import Cost Report Files */
 forvalues j = 15(1)20 {
 cd "C:\Users\twarne\OneDrive\Medicaid Project\Hospital Cost Report Data\20`j'"
 
@@ -38,6 +39,8 @@ save Alphanum_20`j'.dta, replace
 
 use Alphanum_20`j'.dta, clear
 
+/* Trim Alphanumeric Data to Relevant Values for Analysis */
+
 gen keep = 0
  replace keep = 1 if wksht == "S200001"  & line == "00300"  & column == "00100"
  replace keep = 1 if wksht == "S200001"  & line == "00200"  & column == "00100"
@@ -51,6 +54,7 @@ gen keep = 0
  replace keep = 1 if wksht == "S200001"  & line == "02100"  & column == "00100"
 keep if keep ==1
 
+/* Create Single Identifier for Category Values */
 gen field_loc = lower(wksht) + "_" + line + "_" + column
 drop wksht line column
 reshape wide value, i(rpt_num) j(field_loc) string
@@ -58,6 +62,8 @@ reshape wide value, i(rpt_num) j(field_loc) string
 save Alphanum_20`j'_revised.dta, replace
 
 use Numeric_20`j'.dta, clear
+
+/* Trim Numeric Data to Relevant Values for Analysis */
 
 gen keep = 0
 replace keep = 1 if wksht == "S200001"  & line == "00300"  & column == "00400"
@@ -95,12 +101,15 @@ replace keep = 1 if wksht == "S100000"  & line == "02900"  & column == "00100"
 
 keep if keep == 1
 
+/* Create Single Identifier for Category Values */
+
 gen field_loc = lower(wksht) + "_" + line + "_" + column
 drop wksht line column
 reshape wide value, i(rpt_num) j(field_loc) string
 
 save Numeric_20`j'_revised.dta, replace
 
+/* Merge Alphanumeric and Numeric Data */
 merge 1:1 rpt_num using Alphanum_20`j'_revised.dta, nogen
     sort rpt_num 
     duplicates report rpt_num
@@ -109,6 +118,7 @@ save Merged_20`j'.dta, replace
 
 gen fiscalyear = 20`j'
 
+/* Sum Adminstrative Expense Categories */
 	forvalues k = 0(1)9 {
 	
 	capture gen valuea000000_0050`k'_00700 = 0
@@ -126,6 +136,8 @@ gen fiscalyear = 20`j'
 	}
 
 egen admintotal = rowtotal(admin_cat*)
+
+/* Rename Cost Categories to be Readable */
 
 rename valuea000000_00500_00100 adminsalaries
 
