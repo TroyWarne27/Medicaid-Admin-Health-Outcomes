@@ -13,7 +13,7 @@ rename values200001_02100_00100 control_type
 
 gen zipcode2 = substr(zipcode,1,5)
 
-
+/* Add Medical Records costs to total Admin spending */
 
 gen admintotal2 = abs(admintotal) + medrecords
 
@@ -61,12 +61,11 @@ rename admintotal2 admintotal
  drop county
  
  drop CBSA_num
- 
+
+/* Deduplicate to one record per hospital */
  collapse (firstnm) state fiscalyear control_type zipcode2 (sum) adminsalaries totalrev medicaidrev medicaidcosts medicaidunpaid stateagencyunpaid medicarebaddebt_reimb CMSuncompensatedcare medicaredays medicaiddays admintotal, by (CCN_num)
 
- 
-
-
+/* Generate Dummy Variables for Control Type */
  
  gen non_profit = 0
  
@@ -80,7 +79,7 @@ rename admintotal2 admintotal
  
  replace gov = 1 if control_type == "7" | control_type == "8" | control_type == "9" | control_type == "10" | control_type == "11" | control_type == "12" | control_type == "13"
 	
-	
+/* Create Categorical variable for Revenue size */
  gen revenuesize = 0
  
  _pctile totalrev, percentiles(20 40 60 80)
@@ -102,6 +101,8 @@ rename admintotal2 admintotal
 
 clear 
 
+/* Append data from each fiscal year into one data set */
+
 cd "C:\Users\twarne\OneDrive\Medicaid Project\Medicaid Admin Data\Hospital Medicaid Admin Data"
 
 use "C:\Users\twarne\OneDrive\Medicaid Project\Hospital Cost Report Data\2015\Cost_Report_Limited_2015.dta"
@@ -119,7 +120,7 @@ append using "C:\Users\twarne\OneDrive\Medicaid Project\Hospital Cost Report Dat
 save Hospital_Cost_Report_Master.dta, replace
 
 
-
+/* Merge with Data for Medicaid Adminstrative Spending */
 merge m:1 state fiscalyear using "C:\Users\twarne\OneDrive\Medicaid Project\Medicaid Admin Data\FinalMerge\MedicaidAdminFinal.dta"
 
 
@@ -127,6 +128,8 @@ merge m:1 state fiscalyear using "C:\Users\twarne\OneDrive\Medicaid Project\Medi
 keep if _merge == 3
 
 drop _merge
+
+/* Add data to indicate Urban/Rural Hospitals */
 
 merge m:m zipcode2 using "C:\Users\twarne\OneDrive\Medicaid Project\UrbanRural Dummy\Zipcode RUCA\Urban_Zipcode.dta"
 
